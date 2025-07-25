@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkSmart - Smart Parking App</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        /* ParkSmart App - Complete CSS Stylesheet with Dark Mode */
+
+        /* ===== CSS VARIABLES FOR THEMING ===== */
+        :root {
+            /* Light Mode Colors */
+            --bg-primary: #F9FAFB;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F3F4F6;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+            --border-primary: #E5E7EB;
+            --border-secondary: #F3F4F6;
+            --accent-primary: #4F46E5;
+            --accent-secondary: #10B981;
+            --gradient-primary: linear-gradient(135deg, #4F46E5, #7C3AED, #EC4899);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 10px 30px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --text-tertiary: #64748B;
+            --border-primary: #334155;
+            --border-secondary: #475569;
+            --accent-primary: #6366F1;
+            --accent-secondary: #10B981;
+            --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            line-height: 1.5;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            position: relative;
+            padding-bottom: 80px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ===== DARK MODE TOGGLE ===== */
+        .theme-toggle {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            z-index: 1001;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            border-radius: 50px;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .theme-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .theme-icon.active {
+            background: var(--accent-primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .theme-icon.inactive {
+            color: var(--text-tertiary);
+        }
+
+        /* ===== HEADER STYLES ===== */
+        .header {
+            background: var(--gradient-primary);
+            padding: 20px 20px 30px;
+            border-radius: 0 0 25px 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #FFFFFF, #F3F4F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .header-time {
+            font-size: 14px;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: #EF4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* ===== SEARCH BAR ===== */
+        .search-container {
+            padding: 0 20px;
+            margin: 20px 0;
+        }
+
+        .search-bar {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 0 16px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow-light);
+            border: 2px solid var(--border-primary);
+            transition: all 0.2s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            margin-left: 12px;
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .filter-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--accent-secondary);
+            transform: scale(1.05);
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .action-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .action-card:active {
+            transform: scale(0.98);
+        }
+
+        .action-card.find {
+            background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+            border-color: #A7F3D0;
+        }
+
+        [data-theme="dark"] .action-card.find {
+            background: linear-gradient(135deg, rgba(6, 95, 70, 0.2), rgba(16, 185, 129, 0.1));
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .action-card.book {
+            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+            border-color: #BFDBFE;
+        }
+
+        [data-theme="dark"] .action-card.book {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.2), rgba(99, 102, 241, 0.1));
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .action-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .action-badge {
+            background: #10B981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-badge.smart {
+            background: #2563EB;
+        }
+
+        .action-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .action-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== SECTION STYLES ===== */
+        .section {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            background: #D1FAE5;
+            color: #065F46;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        [data-theme="dark"] .status-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+        }
+
+        /* ===== BOOKING CARD ===== */
+        .booking-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-light);
+            border: 2px solid var(--border-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .booking-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .booking-icon {
+            width: 48px;
+            height: 48px;
+            background: #D1FAE5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 24px;
+            color: #059669;
+        }
+
+        [data-theme="dark"] .booking-icon {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+        }
+
+        .booking-details {
+            flex: 1;
+        }
+
+        .booking-location {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .booking-spot {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .booking-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .booking-amount {
+            text-align: right;
+        }
+
+        .amount-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #10B981;
+        }
+
+        .duration-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .booking-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: #10B981;
+            border: 2px solid #D1FAE5;
+        }
+
+        [data-theme="dark"] .btn-secondary {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: #D1FAE5;
+        }
+
+        [data-theme="dark"] .btn-secondary:hover {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        /* ===== PARKING SPOTS ===== */
+        .spot-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-light);
+            border: 2px solid var(--border-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .spot-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .spot-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .spot-info {
+            flex: 1;
+        }
+
+        .spot-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .spot-address {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .spot-meta {
+            display: flex;
+            gap: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .price-container {
+            text-align: right;
+        }
+
+        .price-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-primary);
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .availability-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.available {
+            background: #10B981;
+        }
+
+        .status-dot.full {
+            background: #EF4444;
+        }
+
+        .amenities {  
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .amenity-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .amenity-tag:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .book-btn {
+            width: 100%;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .book-btn:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+        }
+
+        .book-btn:active {
+            transform: scale(0.98);
+        }
+
+        .book-btn:disabled {
+            background: var(--border-primary);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== BOTTOM NAVIGATION ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 2px solid var(--border-secondary);
+            padding: 12px 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .bottom-nav {
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-tertiary);
+        }
+
+        .nav-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            color: var(--accent-primary);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* ===== MODAL STYLES ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            margin: 20px;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+            box-shadow: var(--shadow-medium);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #D1FAE5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: #10B981;
+        }
+
+        [data-theme="dark"] .success-icon {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* ===== DURATION BUTTONS ===== */
+        .duration-btn {
+            padding: 8px 12px;
+            border: 2px solid var(--border-primary);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .duration-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .duration-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid var(--border-primary);
+            z-index: 1002;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: toastSlide 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes toastSlide {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .toast.success {
+            border-color: #10B981;
+            background: linear-gradient(135deg, var(--bg-secondary), rgba(16, 185, 129, 0.05));
+        }
+
+        .toast.error {
+            border-color: #EF4444;
+            background: linear-gradient(135deg, var(--bg-secondary), rgba(239, 68, 68, 0.05));
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: bold; }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .mb-4 { margin-bottom: 16px; }
+        .p-4 { padding: 16px; }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 375px) {
+            .header {
+                padding: 15px 15px 25px;
+            }
+            
+            .search-container,
+            .quick-actions,
+            .section {
+                padding: 0 15px;
+            }
+            
+            .header-title {
+                font-size: 24px;
+            }
+            
+            .action-card {
+                padding: 16px;
+            }
+
+            .theme-toggle {
+                right: 15px;
+                top: 55px;
+            }
+        }
+
+        /* ===== ENHANCED DARK MODE ADJUSTMENTS ===== */
+        [data-theme="dark"] .search-bar:focus-within {
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+        }
+
+        [data-theme="dark"] .action-card:hover {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="dark"] .booking-card:hover,
+        [data-theme="dark"] .spot-card:hover {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Smart Recommendations for Dark Mode */
+        [data-theme="dark"] .smart-recommendation {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1)) !important;
+            border-color: rgba(245, 158, 11, 0.3) !important;
+        }
+
+        [data-theme="dark"] .smart-recommendation .booking-location {
+            color: #F59E0B !important;
+        }
+
+        [data-theme="dark"] .smart-recommendation .booking-spot {
+            color: #D97706 !important;
+        }
+
+        /* Form Inputs */
+        input[type="date"],
+        input[type="time"],
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        [data-theme="dark"] .loading::after {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .btn:focus,
+        .icon-btn:focus,
+        .nav-item:focus,
+        .action-card:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <div class="theme-icon inactive" id="light-icon">☀️</div>
+        <div class="theme-icon active" id="dark-icon">🌙</div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toast-icon">✅</div>
+        <div class="toast-content">
+            <div class="toast-title" id="toast-title">Success!</div>
+            <div class="toast-message" id="toast-message">Action completed successfully</div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1 class="header-title">ParkSmart</h1>
+                    <p class="header-subtitle">Find • Book • Park Smart</p>
+                    <p class="header-time" id="currentTime"></p>
+                </div>
+                <div class="header-icons">
+                    <button class="icon-btn" onclick="showNotifications()">
+                        <span>🔔</span>
+                        <div class="notification-dot"></div>
+                    </button>
+                    <button class="icon-btn" onclick="showView('profile')">
+                        <span>👤</span>
+                    </button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalSaved">₹285</span>
+                    <span class="stat-label">Saved</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalBookings">24</span>
+                    <span class="stat-label">Bookings</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="userRating">4.8★</span>
+                    <span class="stat-label">Rating</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-bar">
+                <span>🔍</span>
+                <input type="text" class="search-input" placeholder="Where do you want to park?" id="searchInput">
+                <button class="filter-btn" onclick="showFilters()">⚙️</button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-card find" onclick="showView('map')">
+                <div class="action-header">
+                    <span class="action-icon">📍</span>
+                    <span class="action-badge">Live</span>
+                </div>
+                <h3 class="action-title">Find Nearby</h3>
+                <p class="action-subtitle">Real-time availability</p>
+            </div>
+            <div class="action-card book" onclick="showView('booking')">
+                <div class="action-header">
+                    <span class="action-icon">📅</span>
+                    <span class="action-badge smart">Smart</span>
+                </div>
+                <h3 class="action-title">Pre-Book</h3>
+                <p class="action-subtitle">Reserve in advance</p>
+            </div>
+        </div>
+
+        <!-- Main Content Views -->
+        <div id="dashboard-view">
+            <!-- Active Bookings -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Active Bookings</h2>
+                    <span class="status-badge" id="activeBookingsCount">1 Active</span>
+                </div>
+                <div id="activeBookingsList">
+                    <!-- Active bookings will be populated here -->
+                </div>
+            </div>
+
+            <!-- Smart Recommendations -->
+            <div class="section">
+                <h2 class="section-title">Smart Recommendations</h2>
+                <div class="booking-card smart-recommendation" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); border-color: #F59E0B;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">⚡</span>
+                        <div>
+                            <div class="booking-location" style="color: #92400E;">Peak Hours Alert</div>
+                            <div class="booking-spot" style="color: #B45309;">Book early for 2-4 PM slots to save 15%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map View -->
+        <div id="map-view" class="hidden">
+            <div class="section">
+                <div style="background: linear-gradient(135deg, #DBEAFE, #E0E7FF); height: 250px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+                    <span style="font-size: 64px; margin-bottom: 16px;">🗺️</span>
+                    <h3 style="font-size: 18px; font-weight: bold; color: #1E40AF; margin-bottom: 8px;">Interactive Map</h3>
+                    <p style="color: #3730A3;">Real-time parking availability</p>
+                    
+                    <!-- Mock Markers -->
+                    <div style="position: absolute; top: 20px; left: 20px; background: #10B981; color: white; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        18 Available
+                    </div>
+                    <div style="position: absolute; top: 60px; right: 30px; background: #F59E0B; color: white; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        12 Available
+                    </div>
+                    <div style="position: absolute; bottom: 40px; left: 50px; background: #EF4444; color: white; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        Full
+                    </div>
+                </div>
+
+                <!-- Parking Spots List -->
+                <div id="parking-spots">
+                    <!-- Spots will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking View -->
+        <div id="booking-view" class="hidden">
+            <div class="section">
+                <h2 class="section-title">Smart Booking</h2>
+                <div class="booking-card">
+                    <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: bold;">Booking Details</h3>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Selected Location</label>
+                        <div style="background: #EFF6FF; border: 2px solid #BFDBFE; padding: 16px; border-radius: 12px;">
+                            <div style="font-weight: bold; color: #1E40AF;" id="selectedLocation">Phoenix Mall Complex</div>
+                            <div style="font-size: 14px; color: #3730A3;" id="selectedAddress">Velachery Main Road, Chennai</div>
+                            <div style="font-size: 18px; font-weight: bold; color: #4F46E5; margin-top: 8px;" id="selectedPrice">₹30/hour</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Date</label>
+                            <input type="date" id="bookingDate" style="width: 100%; padding: 12px; border: 2px solid var(--border-primary); border-radius: 12px; font-size: 16px; background: var(--bg-secondary); color: var(--text-primary);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Time</label>
+                            <input type="time" id="bookingTime" style="width: 100%; padding: 12px; border: 2px solid var(--border-primary); border-radius: 12px; font-size: 16px; background: var(--bg-secondary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Duration</label>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;" id="durationButtons">
+                            <button class="duration-btn active" data-duration="1">1h</button>
+                            <button class="duration-btn" data-duration="2">2h</button>
+                            <button class="duration-btn" data-duration="3">3h</button>
+                            <button class="duration-btn" data-duration="4">4h</button>
+                            <button class="duration-btn" data-duration="8">8h</button>
+                        </div>
+                    </div>
+                    <button class="book-btn" id="completeBookingBtn" onclick="showBookingSuccess()">
+                        Complete Booking - ₹82
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="profile-view" class="hidden">
+            <div class="section">
+                <div style="background: var(--gradient-primary); color: white; padding: 24px; border-radius: 16px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                        <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                            👤
+                        </div>
+                        <div>
+                            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 4px;" id="userName">Rajesh Kumar</h2>
+                            <p style="opacity: 0.8;">Premium Member</p>
+                            <p style="opacity: 0.7; font-size: 14px;">Member since Jan 2024</p>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 16px;">
+                        <div>
+                            <div style="font-size: 20px; font-weight: bold;" id="profileTotalBookings">28</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Total Bookings</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 20px; font-weight: bold;" id="profileTotalSpent">₹2,450</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Total Spent</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 20px; font-weight: bold;" id="profileRating">4.9★</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Your Rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-bottom: 16px;">Recent Bookings</h2>
+                <div id="recentBookingsList">
+                    <!-- Recent bookings will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="history-view" class="hidden">
+            <div class="section">
+                <h2 class="section-title">Booking History</h2>
+                <div id="historyList">
+                    <!-- History will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item" onclick="showView('map')" id="nav-map">
+            <div class="nav-icon">📍</div>
+            <div class="nav-label">Map</div>
+        </div>
+        <div class="nav-item" onclick="showView('booking')" id="nav-booking">
+            <div class="nav-icon">📅</div>
+            <div class="nav-label">Book</div>
+        </div>
+        <div class="nav-item" onclick="showView('history')" id="nav-history">
+            <div class="nav-icon">📋</div>
+            <div class="nav-label">History</div>
+        </div>
+    </nav>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">
+                <span>✅</span>
+            </div>
+            <h3 class="modal-title">Booking Confirmed!</h3>
+            <p class="modal-text">Your parking spot has been reserved successfully. You'll receive a confirmation via SMS and email.</p>
+            <button class="btn btn-primary" onclick="closeModal()" style="width: 100%;">
+                Great! Thanks
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ===== APPLICATION STATE =====
+        let currentView = 'dashboard';
+        let currentTheme = 'light';
+        let selectedDuration = 1;
+        let bookingData = {
+            location: 'Phoenix Mall Complex',
+            address: 'Velachery Main Road, Chennai',
+            price: 30,
+            date: '',
+            time: '',
+            duration: 1
+        };
+
+        // ===== SAMPLE DATA =====
+        const parkingSpots = [
+            {
+                id: 1,
+                name: 'Phoenix Mall Complex',
+                address: 'Velachery Main Road, Chennai',
+                price: 30,
+                available: 18,
+                total: 50,
+                distance: '0.2 km',
+                amenities: ['CCTV', 'Security', 'Covered', 'EV Charging'],
+                rating: 4.8
+            },
+            {
+                id: 2,
+                name: 'Express Avenue Mall',
+                address: 'Royapettah, Chennai',
+                price: 35,
+                available: 12,
+                total: 40,
+                distance: '0.5 km',
+                amenities: ['CCTV', 'Security', 'Valet'],
+                rating: 4.6
+            },
+            {
+                id: 3,
+                name: 'Forum Vijaya Mall',
+                address: 'Vadapalani, Chennai',
+                price: 25,
+                available: 0,
+                total: 30,
+                distance: '0.8 km',
+                amenities: ['CCTV', 'Covered'],
+                rating: 4.4
+            },
+            {
+                id: 4,
+                name: 'VR Chennai',
+                address: 'Anna Nagar, Chennai',
+                price: 40,
+                available: 25,
+                total: 60,
+                distance: '1.2 km',
+                amenities: ['CCTV', 'Security', 'Covered', 'EV Charging', 'Valet'],
+                rating: 4.9
+            }
+        ];
+
+        const activeBookings = [
+            {
+                id: 1,
+                location: 'Phoenix Mall Complex',
+                spot: 'Level 2 - A15',
+                vehicle: 'KA-01-AB-1234',
+                time: 'Today at 14:30',
+                amount: 90,
+                duration: '3h',
+                status: 'active'
+            }
+        ];
+
+        const bookingHistory = [
+            {
+                id: 1,
+                location: 'Phoenix Mall Complex',
+                spot: 'Level 2 - A15',
+                duration: '3 hours',
+                date: 'Jan 15, 2024',
+                amount: 90,
+                status: 'completed'
+            },
+            {
+                id: 2,
+                location: 'Express Avenue Mall',
+                spot: 'Level 1 - B08',
+                duration: '2 hours',
+                date: 'Jan 12, 2024',
+                amount: 70,
+                status: 'completed'
+            },
+            {
+                id: 3,
+                location: 'Forum Vijaya Mall',
+                spot: 'Ground - C12',
+                duration: '4 hours',
+                date: 'Jan 10, 2024',
+                amount: 100,
+                status: 'completed'
+            }
+        ];
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // Set current date and time for booking
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const currentTime = now.toTimeString().slice(0, 5);
+            
+            document.getElementById('bookingDate').value = today;
+            document.getElementById('bookingTime').value = currentTime;
+            
+            // Initialize views
+            renderActiveBookings();
+            renderParkingSpots();
+            renderRecentBookings();
+            renderBookingHistory();
+            
+            // Initialize duration buttons
+            initializeDurationButtons();
+            
+            // Initialize search functionality
+            initializeSearch();
+            
+            // Load saved theme
+            loadTheme();
+        }
+
+        // ===== TIME MANAGEMENT =====
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const dateString = now.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            document.getElementById('currentTime').textContent = `${dateString} • ${timeString}`;
+        }
+
+        // ===== THEME MANAGEMENT =====
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme();
+            saveTheme();
+        }
+
+        function applyTheme() {
+            document.body.setAttribute('data-theme', currentTheme);
+            
+            const lightIcon = document.getElementById('light-icon');
+            const darkIcon = document.getElementById('dark-icon');
+            
+            if (currentTheme === 'dark') {
+                lightIcon.classList.add('active');
+                lightIcon.classList.remove('inactive');
+                darkIcon.classList.add('inactive');
+                darkIcon.classList.remove('active');
+            } else {
+                darkIcon.classList.add('active');
+                darkIcon.classList.remove('inactive');
+                lightIcon.classList.add('inactive');
+                lightIcon.classList.remove('active');
+            }
+        }
+
+        function saveTheme() {
+            // In a real app, this would save to localStorage
+            // localStorage.setItem('parksmartTheme', currentTheme);
+        }
+
+        function loadTheme() {
+            // In a real app, this would load from localStorage
+            // const savedTheme = localStorage.getItem('parksmartTheme');
+            // if (savedTheme) {
+            //     currentTheme = savedTheme;
+            //     applyTheme();
+            // }
+        }
+
+        // ===== VIEW MANAGEMENT =====
+        function showView(viewName) {
+            // Hide all views
+            const views = ['dashboard-view', 'map-view', 'booking-view', 'profile-view', 'history-view'];
+            views.forEach(view => {
+                document.getElementById(view).classList.add('hidden');
+            });
+            
+            // Show selected view
+            document.getElementById(viewName + '-view').classList.remove('hidden');
+            
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeNav = document.getElementById('nav-' + viewName);
+            if (activeNav) {
+                activeNav.classList.add('active');
+            }
+            
+            currentView = viewName;
+            
+            // Trigger view-specific actions
+            if (viewName === 'map') {
+                renderParkingSpots();
+            } else if (viewName === 'booking') {
+                updateBookingPrice();
+            } else if (viewName === 'history') {
+                renderBookingHistory();
+            }
+        }
+
+        // ===== BOOKING MANAGEMENT =====
+        function renderActiveBookings() {
+            const container = document.getElementById('activeBookingsList');
+            container.innerHTML = '';
+            
+            activeBookings.forEach(booking => {
+                const bookingElement = createBookingCard(booking, true);
+                container.appendChild(bookingElement);
+            });
+        }
+
+        function createBookingCard(booking, isActive = false) {
+            const card = document.createElement('div');
+            card.className = 'booking-card';
+            
+            card.innerHTML = `
+                <div class="booking-header">
+                    <div class="booking-icon">🚗</div>
+                    <div class="booking-details">
+                        <div class="booking-location">${booking.location}</div>
+                        <div class="booking-spot">${booking.spot}${booking.vehicle ? ' • ' + booking.vehicle : ''}</div>
+                        <div class="booking-time">${booking.time || booking.date}</div>
+                    </div>
+                    <div class="booking-amount">
+                        <div class="amount-text">₹${booking.amount}</div>
+                        <div class="duration-text">${booking.duration}</div>
+                    </div>
+                </div>
+                ${isActive ? `
+                <div class="booking-actions">
+                    <button class="btn btn-primary" onclick="navigateToSpot(${booking.id})">
+                        <span>🧭</span> Navigate
+                    </button>
+                    <button class="btn btn-secondary" onclick="showQRCode(${booking.id})">
+                        <span>📱</span> QR Code
+                    </button>
+                </div>
+                ` : ''}
+            `;
+            
+            return card;
+        }
+
+        function renderRecentBookings() {
+            const container = document.getElementById('recentBookingsList');
+            container.innerHTML = '';
+            
+            bookingHistory.slice(0, 3).forEach(booking => {
+                const bookingElement = createBookingCard(booking);
+                container.appendChild(bookingElement);
+            });
+        }
+
+        function renderBookingHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
+            
+            bookingHistory.forEach(booking => {
+                const bookingElement = createBookingCard(booking);
+                container.appendChild(bookingElement);
+            });
+        }
+
+        // ===== PARKING SPOTS MANAGEMENT =====
+        function renderParkingSpots() {
+            const container = document.getElementById('parking-spots');
+            container.innerHTML = '';
+            
+            parkingSpots.forEach(spot => {
+                const spotElement = createSpotCard(spot);
+                container.appendChild(spotElement);
+            });
+        }
+
+        function createSpotCard(spot) {
+            const card = document.createElement('div');
+            card.className = 'spot-card';
+            
+            const isAvailable = spot.available > 0;
+            const statusClass = isAvailable ? 'available' : 'full';
+            
+            card.innerHTML = `
+                <div class="spot-header">
+                    <div class="spot-info">
+                        <div class="spot-name">${spot.name}</div>
+                        <div class="spot-address">${spot.address}</div>
+                        <div class="spot-meta">
+                            <div class="meta-item">
+                                <span>📍</span>
+                                <span>${spot.distance}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span>⭐</span>
+                                <span>${spot.rating}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-container">
+                        <div class="price-text">₹${spot.price}</div>
+                        <div class="price-label">per hour</div>
+                    </div>
+                </div>
+                <div class="availability-row">
+                    <div class="status-dot ${statusClass}"></div>
+                    <span>${spot.available} of ${spot.total} spots available</span>
+                </div>
+                <div class="amenities">
+                    ${spot.amenities.map(amenity => `<span class="amenity-tag">${amenity}</span>`).join('')}
+                </div>
+                <button class="book-btn" ${!isAvailable ? 'disabled' : ''} onclick="selectSpot(${spot.id})">
+                    ${isAvailable ? 'Book Now' : 'Full'}
+                </button>
+            `;
+            
+            return card;
+        }
+
+        function selectSpot(spotId) {
+            const spot = parkingSpots.find(s => s.id === spotId);
+            if (!spot || spot.available === 0) return;
+            
+            bookingData.location = spot.name;
+            bookingData.address = spot.address;
+            bookingData.price = spot.price;
+            
+            document.getElementById('selectedLocation').textContent = spot.name;
+            document.getElementById('selectedAddress').textContent = spot.address;
+            document.getElementById('selectedPrice').textContent = `₹${spot.price}/hour`;
+            
+            showView('booking');
+            updateBookingPrice();
+        }
+
+        // ===== DURATION MANAGEMENT =====
+        function initializeDurationButtons() {
+            const buttons = document.querySelectorAll('.duration-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedDuration = parseInt(this.dataset.duration);
+                    bookingData.duration = selectedDuration;
+                    updateBookingPrice();
+                });
+            });
+        }
+
+        function updateBookingPrice() {
+            const totalPrice = bookingData.price * selectedDuration;
+            const bookingBtn = document.getElementById('completeBookingBtn');
+            if (bookingBtn) {
+                bookingBtn.textContent = `Complete Booking - ₹${totalPrice}`;
+            }
+        }
+
+        // ===== SEARCH FUNCTIONALITY =====
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterParkingSpots(query);
+            });
+        }
+
+        function filterParkingSpots(query) {
+            if (currentView !== 'map') return;
+            
+            const container = document.getElementById('parking-spots');
+            const spotCards = container.querySelectorAll('.spot-card');
+            
+            spotCards.forEach(card => {
+                const spotName = card.querySelector('.spot-name').textContent.toLowerCase();
+                const spotAddress = card.querySelector('.spot-address').textContent.toLowerCase();
+                
+                if (spotName.includes(query) || spotAddress.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = query === '' ? 'block' : 'none';
+                }
+            });
+        }
+
+        // ===== MODAL MANAGEMENT =====
+        function showBookingSuccess() {
+            // Update booking data
+            bookingData.date = document.getElementById('bookingDate').value;
+            bookingData.time = document.getElementById('bookingTime').value;
+            
+            // Show loading state
+            const btn = document.getElementById('completeBookingBtn');
+            btn.classList.add('loading');
+            btn.textContent = 'Processing...';
+            
+            // Simulate booking process
+            setTimeout(() => {
+                btn.classList.remove('loading');
+                btn.textContent = `Complete Booking - ₹${bookingData.price * selectedDuration}`;
+                
+                // Add to active bookings
+                const newBooking = {
+                    id: Date.now(),
+                    location: bookingData.location,
+                    spot: 'Level 2 - A15',
+                    vehicle: 'KA-01-AB-1234',
+                    time: `${bookingData.date} at ${bookingData.time}`,
+                    amount: bookingData.price * selectedDuration,
+                    duration: `${selectedDuration}h`,
+                    status: 'active'
+                };
+                
+                activeBookings.push(newBooking);
+                renderActiveBookings();
+                
+                document.getElementById('successModal').classList.add('show');
+                showToast('Booking Confirmed!', 'Your parking spot has been reserved successfully.', 'success');
+            }, 2000);
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('show');
+            showView('dashboard');
+        }
+
+        // ===== NOTIFICATION FUNCTIONS =====
+        function showNotifications() {
+            showToast('Notifications', 'You have 3 new notifications', 'success');
+        }
+
+        function showFilters() {
+            showToast('Filters', 'Filter options coming soon!', 'success');
+        }
+
+        function navigateToSpot(bookingId) {
+            showToast('Navigation', 'Opening navigation to your parking spot...', 'success');
+        }
+
+        function showQRCode(bookingId) {
+            showToast('QR Code', 'QR code for parking entry generated!', 'success');
+        }
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+            
+            // Set content
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            // Set icon based on type
+            switch(type) {
+                case 'success':
+                    toastIcon.textContent = '✅';
+                    toast.className = 'toast success';
+                    break;
+                case 'error':
+                    toastIcon.textContent = '❌';
+                    toast.className = 'toast error';
+                    break;
+                case 'warning':
+                    toastIcon.textContent = '⚠️';
+                    toast.className = 'toast warning';
+                    break;
+                default:
+                    toastIcon.textContent = 'ℹ️';
+                    toast.className = 'toast';
+            }
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ===== UTILITY FUNCTIONS =====
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function formatTime(time) {
+            return new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        function formatCurrency(amount) {
+            return `₹${amount.toLocaleString()}`;
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.addEventListener('click', function(e) {
+            // Close modals when clicking outside
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Prevent form submission on Enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        // Handle online/offline status
+        window.addEventListener('online', function() {
+            showToast('Connected', 'You are back online!', 'success');
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('Offline', 'You are currently offline. Some features may be limited.', 'warning');
+        });
+
+        // ===== PWA SUPPORT =====
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show install prompt
+            showInstallPrompt();
+        });
+
+        function showInstallPrompt() {
+            const installPrompt = document.createElement('div');
+            installPrompt.className = 'install-prompt show';
+            installPrompt.innerHTML = `
+                <div class="install-text">
+                    <strong>Install ParkSmart</strong><br>
+                    Get quick access to parking spots
+                </div>
+                <button class="install-btn" onclick="installApp()">Install</button>
+                <button class="install-btn" onclick="dismissInstall()" style="background: transparent; color: white;">Later</button>
+            `;
+            
+            document.body.appendChild(installPrompt);
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast('Success', 'ParkSmart installed successfully!', 'success');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+            dismissInstall();
+        }
+
+        function dismissInstall() {
+            const installPrompt = document.querySelector('.install-prompt');
+            if (installPrompt) {
+                installPrompt.remove();
+            }
+        }
+
+        // ===== SERVICE WORKER REGISTRATION =====
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // ===== PERFORMANCE OPTIMIZATIONS =====
+        // Lazy load images
+        function lazyLoadImages() {
+            const images = document.querySelectorAll('img[data-lazy]');
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.lazy;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+
+            images.forEach(img => imageObserver.observe(img));
+        }
+
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ===== ANALYTICS & TRACKING =====
+        function trackEvent(eventName, properties = {}) {
+            // In a real app, this would send data to analytics service
+            console.log('Event tracked:', eventName, properties);
+        }
+
+        // Track view changes
+        function trackViewChange(viewName) {
+            trackEvent('view_changed', { view: viewName, timestamp: Date.now() });
+        }
+
+        // Track booking attempts
+        function trackBookingAttempt(spotId) {
+            trackEvent('booking_attempted', { spotId, timestamp: Date.now() });
+        }
+
+        // ===== ERROR HANDLING =====
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            showToast('Error', 'Something went wrong. Please try again.', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            showToast('Error', 'Network error. Please check your connection.', 'error');
+        });
+
+        // ===== ACCESSIBILITY ENHANCEMENTS =====
+        // Keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                document.body.classList.add('keyboard-navigation');
+            }
+        });
+
+        document.addEventListener('mousedown', function() {
+            document.body.classList.remove('keyboard-navigation');
+        });
+
+        // Screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.style.position = 'absolute';
+            announcement.style.left = '-10000px';
+            announcement.style.width = '1px';
+            announcement.style.height = '1px';
+            announcement.style.overflow = 'hidden';
+            announcement.textContent = message;
+            
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+
+        // ===== FINAL INITIALIZATION =====
+        // Initialize app when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // Initialize lazy loading
+        if (document.readyState === 'complete') {
+            lazyLoadImages();
+        } else {
+            window.addEventListener('load', lazyLoadImages);
+        }
+
+        // Add keyboard navigation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .keyboard-navigation *:focus {
+                outline: 2px solid var(--accent-primary) !important;
+                outline-offset: 2px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('ParkSmart App initialized successfully! 🚗✨');
+    </script>
+</body>
+</html>
