@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParkSmart - Smart Parking App</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.png" type="image/png" />
+</head>
+<body>
+  
+<!-- Dark Mode Toggle -->
+<div class="theme-toggle" onclick="toggleTheme()">
+<div class="theme-icon inactive" id="light-icon">☀️</div>
+<div class="theme-icon active" id="dark-icon">🌙</div>
+</div>
+<!-- Toast Notification -->
+<div class="toast" id="toast">
+<div class="toast-icon" id="toast-icon">✅</div>
+<div class="toast-content">
+<div class="toast-title" id="toast-title">Success!</div>
+<div class="toast-message" id="toast-message">Action completed successfully</div>
+</div>
+</div>
+<div class="app-container">
+<!-- Header -->
+<header class="header">
+<div class="header-content">
+<div>
+<h1 class="header-title">ParkSmart</h1>
+<p class="header-subtitle">Find • Book • Park Smart</p>
+<p class="header-time" id="currentTime"></p>
+</div>
+<div class="header-icons">
+<button class="icon-btn" onclick="showNotifications()">
+<span>🔔</span>
+<div class="notification-dot"></div>
+</button>
+<button class="icon-btn" onclick="showView('profile')">
+<span>👤</span>
+</button>
+</div>
+</div>
+<div class="stats-grid">
+<div class="stat-item">
+<span class="stat-value" id="totalSaved">₹285</span>
+<span class="stat-label">Saved</span>
+</div>
+<div class="stat-item">
+<span class="stat-value" id="totalBookings">24</span>
+<span class="stat-label">Bookings</span>
+</div>
+<div class="stat-item">
+<span class="stat-value" id="userRating">4.8★</span>
+<span class="stat-label">Rating</span>
+</div>
+</div>
+</header>
+<!-- Search Bar -->
+<div class="search-container">
+<div class="search-bar">
+<span>🔍</span>
+<input class="search-input" id="searchInput" placeholder="Where do you want to park?" type="text"/>
+<button class="filter-btn" onclick="showFilters()">⚙️</button>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="quick-actions">
+<div class="action-card find" onclick="showView('map')">
+<div class="action-header">
+<span class="action-icon">📍</span>
+<span class="action-badge">Live</span>
+</div>
+<h3 class="action-title">Find Nearby</h3>
+<p class="action-subtitle">Real-time availability</p>
+</div>
+<div class="action-card book" onclick="showView('booking')">
+<div class="action-header">
+<span class="action-icon">📅</span>
+<span class="action-badge smart">Smart</span>
+</div>
+<h3 class="action-title">Pre-Book</h3>
+<p class="action-subtitle">Reserve in advance</p>
+</div>
+</div>
+<!-- Main Content Views -->
+<div id="dashboard-view">
+<!-- Active Bookings -->
+<div class="section">
+<div class="section-header">
+<h2 class="section-title">Active Bookings</h2>
+<span class="status-badge" id="activeBookingsCount">1 Active</span>
+</div>
+<div id="activeBookingsList">
+<!-- Active bookings will be populated here -->
+</div>
+</div>
+<!-- Smart Recommendations -->
+<div class="section">
+<h2 class="section-title">Smart Recommendations</h2>
+<div class="booking-card smart-recommendation" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); border-color: #F59E0B;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<span style="font-size: 24px;">⚡</span>
+<div>
+<div class="booking-location" style="color: #92400E;">Peak Hours Alert</div>
+<div class="booking-spot" style="color: #B45309;">Book early for 2-4 PM slots to save 15%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Map View -->
+<div class="hidden" id="map-view">
+<div class="section">
+<div style="background: linear-gradient(135deg, #DBEAFE, #E0E7FF); height: 250px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+<span style="font-size: 64px; margin-bottom: 16px;">🗺️</span>
+<h3 style="font-size: 18px; font-weight: bold; color: #1E40AF; margin-bottom: 8px;">Interactive Map</h3>
+<p style="color: #3730A3;">Real-time parking availability</p>
+<!-- Mock Markers -->
+<div style="position: absolute; top: 20px; left: 20px; background: #10B981; color: white; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        18 Available
+                    </div>
+<div style="position: absolute; top: 60px; right: 30px; background: #F59E0B; color: white; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        12 Available
+                    </div>
+<div style="position: absolute; bottom: 40px; left: 50px; background: #EF4444; color: white; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        Full
+                    </div>
+</div>
+<!-- Parking Spots List -->
+<div id="parking-spots">
+<!-- Spots will be dynamically generated -->
+</div>
+</div>
+</div>
+<!-- Booking View -->
+<div class="hidden" id="booking-view">
+<div class="section">
+<h2 class="section-title">Smart Booking</h2>
+<div class="booking-card">
+<h3 style="margin-bottom: 16px; font-size: 18px; font-weight: bold;">Booking Details</h3>
+<div style="margin-bottom: 16px;">
+<label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Selected Location</label>
+<div style="background: #EFF6FF; border: 2px solid #BFDBFE; padding: 16px; border-radius: 12px;">
+<div id="selectedLocation" style="font-weight: bold; color: #1E40AF;">Phoenix Mall Complex</div>
+<div id="selectedAddress" style="font-size: 14px; color: #3730A3;">Velachery Main Road, Chennai</div>
+<div id="selectedPrice" style="font-size: 18px; font-weight: bold; color: #4F46E5; margin-top: 8px;">₹30/hour</div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+<div>
+<label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Date</label>
+<input id="bookingDate" style="width: 100%; padding: 12px; border: 2px solid var(--border-primary); border-radius: 12px; font-size: 16px; background: var(--bg-secondary); color: var(--text-primary);" type="date"/>
+</div>
+<div>
+<label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Time</label>
+<input id="bookingTime" style="width: 100%; padding: 12px; border: 2px solid var(--border-primary); border-radius: 12px; font-size: 16px; background: var(--bg-secondary); color: var(--text-primary);" type="time"/>
+</div>
+</div>
+<div style="margin-bottom: 20px;">
+<label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Duration</label>
+<div id="durationButtons" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+<button class="duration-btn active" data-duration="1">1h</button>
+<button class="duration-btn" data-duration="2">2h</button>
+<button class="duration-btn" data-duration="3">3h</button>
+<button class="duration-btn" data-duration="4">4h</button>
+<button class="duration-btn" data-duration="8">8h</button>
+</div>
+</div>
+<button class="book-btn" id="completeBookingBtn" onclick="showBookingSuccess()">
+                        Complete Booking - ₹82
+                    </button>
+</div>
+</div>
+</div>
+<!-- Profile View -->
+<div class="hidden" id="profile-view">
+<div class="section">
+<div style="background: var(--gradient-primary); color: white; padding: 24px; border-radius: 16px; margin-bottom: 20px;">
+<div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+<div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                            👤
+                        </div>
+<div>
+<h2 id="userName" style="font-size: 24px; font-weight: bold; margin-bottom: 4px;">Rajesh Kumar</h2>
+<p style="opacity: 0.8;">Premium Member</p>
+<p style="opacity: 0.7; font-size: 14px;">Member since Jan 2024</p>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 16px;">
+<div>
+<div id="profileTotalBookings" style="font-size: 20px; font-weight: bold;">28</div>
+<div style="font-size: 12px; opacity: 0.7;">Total Bookings</div>
+</div>
+<div>
+<div id="profileTotalSpent" style="font-size: 20px; font-weight: bold;">₹2,450</div>
+<div style="font-size: 12px; opacity: 0.7;">Total Spent</div>
+</div>
+<div>
+<div id="profileRating" style="font-size: 20px; font-weight: bold;">4.9★</div>
+<div style="font-size: 12px; opacity: 0.7;">Your Rating</div>
+</div>
+</div>
+</div>
+<h2 class="section-title" style="margin-bottom: 16px;">Recent Bookings</h2>
+<div id="recentBookingsList">
+<!-- Recent bookings will be populated here -->
+</div>
+</div>
+</div>
+<!-- History View -->
+<div class="hidden" id="history-view">
+<div class="section">
+<h2 class="section-title">Booking History</h2>
+<div id="historyList">
+<!-- History will be populated here -->
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+<div class="nav-item active" id="nav-dashboard" onclick="showView('dashboard')">
+<div class="nav-icon">🏠</div>
+<div class="nav-label">Home</div>
+</div>
+<div class="nav-item" id="nav-map" onclick="showView('map')">
+<div class="nav-icon">📍</div>
+<div class="nav-label">Map</div>
+</div>
+<div class="nav-item" id="nav-booking" onclick="showView('booking')">
+<div class="nav-icon">📅</div>
+<div class="nav-label">Book</div>
+</div>
+<div class="nav-item" id="nav-history" onclick="showView('history')">
+<div class="nav-icon">📋</div>
+<div class="nav-label">History</div>
+</div>
+</nav>
+<!-- Success Modal -->
+<div class="modal" id="successModal">
+<div class="modal-content">
+<div class="success-icon">
+<span>✅</span>
+</div>
+<h3 class="modal-title">Booking Confirmed!</h3>
+<p class="modal-text">Your parking spot has been reserved successfully. You'll receive a confirmation via SMS and email.</p>
+<button class="btn btn-primary" onclick="closeModal()" style="width: 100%;">
+                Great! Thanks
+            </button>
+</div>
+</div>
+<script>
+        // ===== APPLICATION STATE =====
+        let currentView = 'dashboard';
+        let currentTheme = 'light';
+        let selectedDuration = 1;
+        let bookingData = {
+            location: 'Phoenix Mall Complex',
+            address: 'Velachery Main Road, Chennai',
+            price: 30,
+            date: '',
+            time: '',
+            duration: 1
+        };
+
+        // ===== SAMPLE DATA =====
+        const parkingSpots = [
+            {
+                id: 1,
+                name: 'Phoenix Mall Complex',
+                address: 'Velachery Main Road, Chennai',
+                price: 30,
+                available: 18,
+                total: 50,
+                distance: '0.2 km',
+                amenities: ['CCTV', 'Security', 'Covered', 'EV Charging'],
+                rating: 4.8
+            },
+            {
+                id: 2,
+                name: 'Express Avenue Mall',
+                address: 'Royapettah, Chennai',
+                price: 35,
+                available: 12,
+                total: 40,
+                distance: '0.5 km',
+                amenities: ['CCTV', 'Security', 'Valet'],
+                rating: 4.6
+            },
+            {
+                id: 3,
+                name: 'Forum Vijaya Mall',
+                address: 'Vadapalani, Chennai',
+                price: 25,
+                available: 0,
+                total: 30,
+                distance: '0.8 km',
+                amenities: ['CCTV', 'Covered'],
+                rating: 4.4
+            },
+            {
+                id: 4,
+                name: 'VR Chennai',
+                address: 'Anna Nagar, Chennai',
+                price: 40,
+                available: 25,
+                total: 60,
+                distance: '1.2 km',
+                amenities: ['CCTV', 'Security', 'Covered', 'EV Charging', 'Valet'],
+                rating: 4.9
+            }
+        ];
+
+        const activeBookings = [
+            {
+                id: 1,
+                location: 'Phoenix Mall Complex',
+                spot: 'Level 2 - A15',
+                vehicle: 'KA-01-AB-1234',
+                time: 'Today at 14:30',
+                amount: 90,
+                duration: '3h',
+                status: 'active'
+            }
+        ];
+
+        const bookingHistory = [
+            {
+                id: 1,
+                location: 'Phoenix Mall Complex',
+                spot: 'Level 2 - A15',
+                duration: '3 hours',
+                date: 'Jan 15, 2024',
+                amount: 90,
+                status: 'completed'
+            },
+            {
+                id: 2,
+                location: 'Express Avenue Mall',
+                spot: 'Level 1 - B08',
+                duration: '2 hours',
+                date: 'Jan 12, 2024',
+                amount: 70,
+                status: 'completed'
+            },
+            {
+                id: 3,
+                location: 'Forum Vijaya Mall',
+                spot: 'Ground - C12',
+                duration: '4 hours',
+                date: 'Jan 10, 2024',
+                amount: 100,
+                status: 'completed'
+            }
+        ];
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // Set current date and time for booking
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const currentTime = now.toTimeString().slice(0, 5);
+            
+            document.getElementById('bookingDate').value = today;
+            document.getElementById('bookingTime').value = currentTime;
+            
+            // Initialize views
+            renderActiveBookings();
+            renderParkingSpots();
+            renderRecentBookings();
+            renderBookingHistory();
+            
+            // Initialize duration buttons
+            initializeDurationButtons();
+            
+            // Initialize search functionality
+            initializeSearch();
+            
+            // Load saved theme
+            loadTheme();
+        }
+
+        // ===== TIME MANAGEMENT =====
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const dateString = now.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            document.getElementById('currentTime').textContent = `${dateString} • ${timeString}`;
+        }
+
+        // ===== THEME MANAGEMENT =====
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme();
+            saveTheme();
+        }
+
+        function applyTheme() {
+            document.body.setAttribute('data-theme', currentTheme);
+            
+            const lightIcon = document.getElementById('light-icon');
+            const darkIcon = document.getElementById('dark-icon');
+            
+            if (currentTheme === 'dark') {
+                lightIcon.classList.add('active');
+                lightIcon.classList.remove('inactive');
+                darkIcon.classList.add('inactive');
+                darkIcon.classList.remove('active');
+            } else {
+                darkIcon.classList.add('active');
+                darkIcon.classList.remove('inactive');
+                lightIcon.classList.add('inactive');
+                lightIcon.classList.remove('active');
+            }
+        }
+
+        function saveTheme() {
+            // In a real app, this would save to localStorage
+            // localStorage.setItem('parksmartTheme', currentTheme);
+        }
+
+        function loadTheme() {
+            // In a real app, this would load from localStorage
+            // const savedTheme = localStorage.getItem('parksmartTheme');
+            // if (savedTheme) {
+            //     currentTheme = savedTheme;
+            //     applyTheme();
+            // }
+        }
+
+        // ===== VIEW MANAGEMENT =====
+        function showView(viewName) {
+            // Hide all views
+            const views = ['dashboard-view', 'map-view', 'booking-view', 'profile-view', 'history-view'];
+            views.forEach(view => {
+                document.getElementById(view).classList.add('hidden');
+            });
+            
+            // Show selected view
+            document.getElementById(viewName + '-view').classList.remove('hidden');
+            
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeNav = document.getElementById('nav-' + viewName);
+            if (activeNav) {
+                activeNav.classList.add('active');
+            }
+            
+            currentView = viewName;
+            
+            // Trigger view-specific actions
+            if (viewName === 'map') {
+                renderParkingSpots();
+            } else if (viewName === 'booking') {
+                updateBookingPrice();
+            } else if (viewName === 'history') {
+                renderBookingHistory();
+            }
+        }
+
+        // ===== BOOKING MANAGEMENT =====
+        function renderActiveBookings() {
+            const container = document.getElementById('activeBookingsList');
+            container.innerHTML = '';
+            
+            activeBookings.forEach(booking => {
+                const bookingElement = createBookingCard(booking, true);
+                container.appendChild(bookingElement);
+            });
+        }
+
+        function createBookingCard(booking, isActive = false) {
+            const card = document.createElement('div');
+            card.className = 'booking-card';
+            
+            card.innerHTML = `
+                <div class="booking-header">
+                    <div class="booking-icon">🚗</div>
+                    <div class="booking-details">
+                        <div class="booking-location">${booking.location}</div>
+                        <div class="booking-spot">${booking.spot}${booking.vehicle ? ' • ' + booking.vehicle : ''}</div>
+                        <div class="booking-time">${booking.time || booking.date}</div>
+                    </div>
+                    <div class="booking-amount">
+                        <div class="amount-text">₹${booking.amount}</div>
+                        <div class="duration-text">${booking.duration}</div>
+                    </div>
+                </div>
+                ${isActive ? `
+                <div class="booking-actions">
+                    <button class="btn btn-primary" onclick="navigateToSpot(${booking.id})">
+                        <span>🧭</span> Navigate
+                    </button>
+                    <button class="btn btn-secondary" onclick="showQRCode(${booking.id})">
+                        <span>📱</span> QR Code
+                    </button>
+                </div>
+                ` : ''}
+            `;
+            
+            return card;
+        }
+
+        function renderRecentBookings() {
+            const container = document.getElementById('recentBookingsList');
+            container.innerHTML = '';
+            
+            bookingHistory.slice(0, 3).forEach(booking => {
+                const bookingElement = createBookingCard(booking);
+                container.appendChild(bookingElement);
+            });
+        }
+
+        function renderBookingHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
+            
+            bookingHistory.forEach(booking => {
+                const bookingElement = createBookingCard(booking);
+                container.appendChild(bookingElement);
+            });
+        }
+
+        // ===== PARKING SPOTS MANAGEMENT =====
+        function renderParkingSpots() {
+            const container = document.getElementById('parking-spots');
+            container.innerHTML = '';
+            
+            parkingSpots.forEach(spot => {
+                const spotElement = createSpotCard(spot);
+                container.appendChild(spotElement);
+            });
+        }
+
+        function createSpotCard(spot) {
+            const card = document.createElement('div');
+            card.className = 'spot-card';
+            
+            const isAvailable = spot.available > 0;
+            const statusClass = isAvailable ? 'available' : 'full';
+            
+            card.innerHTML = `
+                <div class="spot-header">
+                    <div class="spot-info">
+                        <div class="spot-name">${spot.name}</div>
+                        <div class="spot-address">${spot.address}</div>
+                        <div class="spot-meta">
+                            <div class="meta-item">
+                                <span>📍</span>
+                                <span>${spot.distance}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span>⭐</span>
+                                <span>${spot.rating}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-container">
+                        <div class="price-text">₹${spot.price}</div>
+                        <div class="price-label">per hour</div>
+                    </div>
+                </div>
+                <div class="availability-row">
+                    <div class="status-dot ${statusClass}"></div>
+                    <span>${spot.available} of ${spot.total} spots available</span>
+                </div>
+                <div class="amenities">
+                    ${spot.amenities.map(amenity => `<span class="amenity-tag">${amenity}</span>`).join('')}
+                </div>
+                <button class="book-btn" ${!isAvailable ? 'disabled' : ''} onclick="selectSpot(${spot.id})">
+                    ${isAvailable ? 'Book Now' : 'Full'}
+                </button>
+            `;
+            
+            return card;
+        }
+
+        function selectSpot(spotId) {
+            const spot = parkingSpots.find(s => s.id === spotId);
+            if (!spot || spot.available === 0) return;
+            
+            bookingData.location = spot.name;
+            bookingData.address = spot.address;
+            bookingData.price = spot.price;
+            
+            document.getElementById('selectedLocation').textContent = spot.name;
+            document.getElementById('selectedAddress').textContent = spot.address;
+            document.getElementById('selectedPrice').textContent = `₹${spot.price}/hour`;
+            
+            showView('booking');
+            updateBookingPrice();
+        }
+
+        // ===== DURATION MANAGEMENT =====
+        function initializeDurationButtons() {
+            const buttons = document.querySelectorAll('.duration-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedDuration = parseInt(this.dataset.duration);
+                    bookingData.duration = selectedDuration;
+                    updateBookingPrice();
+                });
+            });
+        }
+
+        function updateBookingPrice() {
+            const totalPrice = bookingData.price * selectedDuration;
+            const bookingBtn = document.getElementById('completeBookingBtn');
+            if (bookingBtn) {
+                bookingBtn.textContent = `Complete Booking - ₹${totalPrice}`;
+            }
+        }
+
+        // ===== SEARCH FUNCTIONALITY =====
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterParkingSpots(query);
+            });
+        }
+
+        function filterParkingSpots(query) {
+            if (currentView !== 'map') return;
+            
+            const container = document.getElementById('parking-spots');
+            const spotCards = container.querySelectorAll('.spot-card');
+            
+            spotCards.forEach(card => {
+                const spotName = card.querySelector('.spot-name').textContent.toLowerCase();
+                const spotAddress = card.querySelector('.spot-address').textContent.toLowerCase();
+                
+                if (spotName.includes(query) || spotAddress.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = query === '' ? 'block' : 'none';
+                }
+            });
+        }
+
+        // ===== MODAL MANAGEMENT =====
+        function showBookingSuccess() {
+            // Update booking data
+            bookingData.date = document.getElementById('bookingDate').value;
+            bookingData.time = document.getElementById('bookingTime').value;
+            
+            // Show loading state
+            const btn = document.getElementById('completeBookingBtn');
+            btn.classList.add('loading');
+            btn.textContent = 'Processing...';
+            
+            // Simulate booking process
+            setTimeout(() => {
+                btn.classList.remove('loading');
+                btn.textContent = `Complete Booking - ₹${bookingData.price * selectedDuration}`;
+                
+                // Add to active bookings
+                const newBooking = {
+                    id: Date.now(),
+                    location: bookingData.location,
+                    spot: 'Level 2 - A15',
+                    vehicle: 'KA-01-AB-1234',
+                    time: `${bookingData.date} at ${bookingData.time}`,
+                    amount: bookingData.price * selectedDuration,
+                    duration: `${selectedDuration}h`,
+                    status: 'active'
+                };
+                
+                activeBookings.push(newBooking);
+                renderActiveBookings();
+                
+                document.getElementById('successModal').classList.add('show');
+                showToast('Booking Confirmed!', 'Your parking spot has been reserved successfully.', 'success');
+            }, 2000);
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('show');
+            showView('dashboard');
+        }
+
+        // ===== NOTIFICATION FUNCTIONS =====
+        function showNotifications() {
+            showToast('Notifications', 'You have 3 new notifications', 'success');
+        }
+
+        function showFilters() {
+            showToast('Filters', 'Filter options coming soon!', 'success');
+        }
+
+        function navigateToSpot(bookingId) {
+            showToast('Navigation', 'Opening navigation to your parking spot...', 'success');
+        }
+
+        function showQRCode(bookingId) {
+            showToast('QR Code', 'QR code for parking entry generated!', 'success');
+        }
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+            
+            // Set content
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            // Set icon based on type
+            switch(type) {
+                case 'success':
+                    toastIcon.textContent = '✅';
+                    toast.className = 'toast success';
+                    break;
+                case 'error':
+                    toastIcon.textContent = '❌';
+                    toast.className = 'toast error';
+                    break;
+                case 'warning':
+                    toastIcon.textContent = '⚠️';
+                    toast.className = 'toast warning';
+                    break;
+                default:
+                    toastIcon.textContent = 'ℹ️';
+                    toast.className = 'toast';
+            }
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ===== UTILITY FUNCTIONS =====
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function formatTime(time) {
+            return new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        function formatCurrency(amount) {
+            return `₹${amount.toLocaleString()}`;
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.addEventListener('click', function(e) {
+            // Close modals when clicking outside
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Prevent form submission on Enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        // Handle online/offline status
+        window.addEventListener('online', function() {
+            showToast('Connected', 'You are back online!', 'success');
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('Offline', 'You are currently offline. Some features may be limited.', 'warning');
+        });
+
+        // ===== PWA SUPPORT =====
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show install prompt
+            showInstallPrompt();
+        });
+
+        function showInstallPrompt() {
+            const installPrompt = document.createElement('div');
+            installPrompt.className = 'install-prompt show';
+            installPrompt.innerHTML = `
+                <div class="install-text">
+                    <strong>Install ParkSmart</strong><br>
+                    Get quick access to parking spots
+                </div>
+                <button class="install-btn" onclick="installApp()">Install</button>
+                <button class="install-btn" onclick="dismissInstall()" style="background: transparent; color: white;">Later</button>
+            `;
+            
+            document.body.appendChild(installPrompt);
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast('Success', 'ParkSmart installed successfully!', 'success');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+            dismissInstall();
+        }
+
+        function dismissInstall() {
+            const installPrompt = document.querySelector('.install-prompt');
+            if (installPrompt) {
+                installPrompt.remove();
+            }
+        }
+
+        // ===== SERVICE WORKER REGISTRATION =====
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // ===== PERFORMANCE OPTIMIZATIONS =====
+        // Lazy load images
+        function lazyLoadImages() {
+            const images = document.querySelectorAll('img[data-lazy]');
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.lazy;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+
+            images.forEach(img => imageObserver.observe(img));
+        }
+
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ===== ANALYTICS & TRACKING =====
+        function trackEvent(eventName, properties = {}) {
+            // In a real app, this would send data to analytics service
+            console.log('Event tracked:', eventName, properties);
+        }
+
+        // Track view changes
+        function trackViewChange(viewName) {
+            trackEvent('view_changed', { view: viewName, timestamp: Date.now() });
+        }
+
+        // Track booking attempts
+        function trackBookingAttempt(spotId) {
+            trackEvent('booking_attempted', { spotId, timestamp: Date.now() });
+        }
+
+        // ===== ERROR HANDLING =====
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            showToast('Error', 'Something went wrong. Please try again.', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            showToast('Error', 'Network error. Please check your connection.', 'error');
+        });
+
+        // ===== ACCESSIBILITY ENHANCEMENTS =====
+        // Keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                document.body.classList.add('keyboard-navigation');
+            }
+        });
+
+        document.addEventListener('mousedown', function() {
+            document.body.classList.remove('keyboard-navigation');
+        });
+
+        // Screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.style.position = 'absolute';
+            announcement.style.left = '-10000px';
+            announcement.style.width = '1px';
+            announcement.style.height = '1px';
+            announcement.style.overflow = 'hidden';
+            announcement.textContent = message;
+            
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+
+        // ===== FINAL INITIALIZATION =====
+        // Initialize app when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // Initialize lazy loading
+        if (document.readyState === 'complete') {
+            lazyLoadImages();
+        } else {
+            window.addEventListener('load', lazyLoadImages);
+        }
+
+        // Add keyboard navigation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .keyboard-navigation *:focus {
+                outline: 2px solid var(--accent-primary) !important;
+                outline-offset: 2px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('ParkSmart App initialized successfully! 🚗✨');
+    </script>
+
+  <script src="app.js"></script>
+</body>
+</html>
